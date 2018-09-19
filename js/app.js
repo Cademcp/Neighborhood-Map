@@ -8,12 +8,6 @@ var locations = [
     {title: 'Peoria Civic Center', location: {lat: 40.692055, lng: -89.593948}}
 ];
 
-var listInfo = function (locations) {
-    
-}
-
-// START VIEWMODEL?
-
 var map;
 
 var markers = [];
@@ -60,6 +54,7 @@ function initMap() {
     }
     // Extend the boundaries of the map for each marker
     map.fitBounds(bounds);
+    showMarkerList(markers);
 }
 
 function populateInfoWindow(marker, infowindow) {
@@ -76,8 +71,17 @@ function populateInfoWindow(marker, infowindow) {
 }
 
 // Event listener to show the InfoWindow when the marker is clicked
-marker.addListener('click', function () {
-    populateInfoWindow(this, largeInfowindow);
-});
+// marker.addListener('click', function () {
+//     populateInfoWindow(this, largeInfowindow);
+// });
+
+function showMarkerList(markerList) {
+    for (var i = 0; i < markerList.length; i++) {
+        var node = document.createElement('LI');
+        var textnode = document.createTextNode(markerList[i].title);
+        node.appendChild(textnode);
+        document.getElementById('marker-name').appendChild(node);
+    }
+}
 
 

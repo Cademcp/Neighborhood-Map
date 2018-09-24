@@ -9,51 +9,56 @@ var locations = [
 ];
 
 var map;
-
-var markers = [];
-var Markers = ko.observableArray([]);
+var largeInfowindow;
+var bounds;
 
 // Function to initialize the map within the map div
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         // initial center is Peoria, Il coordinates
         center: {lat: 40.6936, lng: -89.5890},
-        zoom: 14
+        zoom: 14,
+        mapTypeControl: false
     });
 
     // Creating an info window to appear when the marker is clicked
     var largeInfowindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
 
-    // A loop to put all of the markers into an array and display them
-    for (var i = 0; i < locations.length; i++) {
-        // Get the position from the location array.
-        var position = locations[i].location;
-        var title = locations[i].title;
-        // Create a marker per location, and put into markers array.
-        var marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: title,
-            animation: google.maps.Animation.DROP,
-            id: i + 1
-        });
-        // Add marker to array
-        markers.push(marker);
-        // Put onclick in the loop so that each marker has it applied
-        marker.addListener('click', function () {
-            populateInfoWindow(this, largeInfowindow);
-            console.log("CLICKED");
-        });
-        Markers.push(new Marker(marker));
-        console.log(Markers());
-        bounds.extend(markers[i].position);
-    }
-    // Extend the boundaries of the map for each marker
-    map.fitBounds(bounds);
+    ko.applyBindings(new myViewModel());
 
 }
 
+var Marker = function (info) {
+
+    var self = this;
+    this.position = info.position;
+    this.title = info.title;
+
+    this.marker = new google.maps.Marker({
+        position: this.position,
+        title: this.title,
+        animation: google.maps.Animation.DROP
+    });
+
+    this.marker.addListener('click', function() {
+        populateInfoWindow(this, largeInfowindow);
+    });
+}
+
+var myViewModel = function() {
+
+    var self = this;
+
+    this.markerList = ko.observableArray([]);
+
+    locations.forEach(function (location) {
+        self.markerList.push(new Marker(location));
+    });
+
+};
+
+// function to populate infowindow provided by Udacity Google Maps API videos
 function populateInfoWindow(marker, infowindow) {
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
@@ -66,39 +71,3 @@ function populateInfoWindow(marker, infowindow) {
         });
     }
 }
-
-// function showMarkerList(markerList) {
-//     console.log(markerList);
-//     var largeInfowindow = new google.maps.InfoWindow();
-//     for (var i = 0; i < markerList.length; i++) {
-//         var node = document.createElement('LI');
-//         var textnode = document.createTextNode(markerList[i].title);
-//         node.appendChild(textnode);
-//         node.addEventListener('click', function () {
-//             populateInfoWindow(markerList[i], largeInfowindow);
-//             console.log(markerList[i] + " WAS CLICKED");
-//         });
-//         document.getElementById('marker-name').appendChild(node);
-//     }
-// }
-
-
-
-var Marker = function (marker) {
-    this.map = marker.map;
-    this.position = marker.position;
-    this.title = marker.title;
-    this.id = marker.id;
-}
-
-var myViewModel = function() {
-
-    var self = this;
-
-    this.currentPlace = ko.observable(Markers()[0]);
-    self.showInfo = function () {
-        populateInfoWindow()
-    }
-};
-
-ko.applyBindings(new myViewModel());

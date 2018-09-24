@@ -22,7 +22,7 @@ function initMap() {
     });
 
     // Creating an info window to appear when the marker is clicked
-    var largeInfowindow = new google.maps.InfoWindow();
+    largeInfowindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
 
     ko.applyBindings(new myViewModel());
@@ -32,16 +32,21 @@ function initMap() {
 var Marker = function (info) {
 
     var self = this;
-    this.position = info.position;
+    this.position = info.location;
     this.title = info.title;
+    this.map = map;
+
+    this.visible = ko.observable(true);
 
     this.marker = new google.maps.Marker({
         position: this.position,
         title: this.title,
-        animation: google.maps.Animation.DROP
+        animation: google.maps.Animation.DROP,
+        map: this.map
     });
 
     this.marker.addListener('click', function() {
+        console.log(this);
         populateInfoWindow(this, largeInfowindow);
     });
 }
@@ -61,6 +66,7 @@ var myViewModel = function() {
 // function to populate infowindow provided by Udacity Google Maps API videos
 function populateInfoWindow(marker, infowindow) {
     // Check to make sure the infowindow is not already opened on this marker.
+
     if (infowindow.marker != marker) {
         infowindow.marker = marker;
         infowindow.setContent('<div>' + marker.title + '</div>');

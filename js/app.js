@@ -12,6 +12,21 @@ var map;
 
 var markers = [];
 
+var Marker = function (data) {
+    this.title = ko.obervable(data.title);
+    this.location = ko.obervable(data.location);
+};
+
+var ViewModel = function () {
+    var self = this;
+    
+    this.markerList = ko.observableArray([]);
+    
+    locations.forEach(function () {
+        
+    })
+}
+
 // Function to initialize the map within the map div
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -20,13 +35,6 @@ function initMap() {
         zoom: 14
     });
 
-    // Created a single marker to display on the map in the location selected from
-    // locations array
-    var marker = new google.maps.Marker({
-        position: locations[0]['location'],
-        map: map,
-        title: locations[0]['title']
-    });
     // Creating an info window to appear when the marker is clicked
     var largeInfowindow = new google.maps.InfoWindow();
     var bounds = new google.maps.LatLngBounds();
@@ -42,19 +50,21 @@ function initMap() {
             position: position,
             title: title,
             animation: google.maps.Animation.DROP,
-            id: i
+            id: i + 1
         });
         // Add marker to array
         markers.push(marker);
         // Put onclick in the loop so that each marker has it applied
         marker.addListener('click', function () {
+            console.log(this.id);
             populateInfoWindow(this, largeInfowindow);
         });
         bounds.extend(markers[i].position);
     }
     // Extend the boundaries of the map for each marker
     map.fitBounds(bounds);
-    showMarkerList(markers);
+    // Show list of markers
+    // showMarkerList(markers);
 }
 
 function populateInfoWindow(marker, infowindow) {
@@ -70,18 +80,80 @@ function populateInfoWindow(marker, infowindow) {
     }
 }
 
-// Event listener to show the InfoWindow when the marker is clicked
-// marker.addListener('click', function () {
-//     populateInfoWindow(this, largeInfowindow);
-// });
-
-function showMarkerList(markerList) {
-    for (var i = 0; i < markerList.length; i++) {
-        var node = document.createElement('LI');
-        var textnode = document.createTextNode(markerList[i].title);
-        node.appendChild(textnode);
-        document.getElementById('marker-name').appendChild(node);
-    }
+function getPlacesDetails(marker, infowindow) {
+    var service = new google.maps.places.PlacesService(map);
+    service.getDetails({
+        placeId: marker.id
+    }, function(place, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            // Set the marker property on this infowindow so it isn't created again.
+            infowindow.marker = marker;
+            var innerHTML = '<div>';
+            if (place.name) {
+                innerHTML += '<strong>' + place.name + '</strong>';
+            }
+            if (place.formatted_address) {
+                innerHTML += '<br>' + place.formatted_address;
+            }
+            if (place.formatted_phone_number) {
+                innerHTML += '<br>' + place.formatted_phone_number;
+            }
+            if (place.opening_hours) {
+                innerHTML += '<br><br><strong>Hours:</strong><br>' +
+                    place.opening_hours.weekday_text[0] + '<br>' +
+                    place.opening_hours.weekday_text[1] + '<br>' +
+                    place.opening_hours.weekday_text[2] + '<br>' +
+                    place.opening_hours.weekday_text[3] + '<br>' +
+                    place.opening_hours.weekday_text[4] + '<br>' +
+                    place.opening_hours.weekday_text[5] + '<br>' +
+                    place.opening_hours.weekday_text[6];
+            }
+            if (place.photos) {
+                innerHTML += '<br><br><img src="' + place.photos[0].getUrl(
+                    {maxHeight: 100, maxWidth: 200}) + '">';
+            }
+            innerHTML += '</div>';
+            infowindow.setContent(innerHTML);
+            infowindow.open(map, marker);
+            // Make sure the marker property is cleared if the infowindow is closed.
+            infowindow.addListener('closeclick', function() {
+                infowindow.marker = null;
+            });
+        }
+    });
 }
 
+// function showMarkerList(markerList) {
+//     console.log(markerList);
+//     var largeInfowindow = new google.maps.InfoWindow();
+//     for (var i = 0; i < markerList.length; i++) {
+//         var node = document.createElement('LI');
+//         var textnode = document.createTextNode(markerList[i].title);
+//         node.appendChild(textnode);
+//         node.addEventListener('click', function () {
+//             populateInfoWindow(markerList[i], largeInfowindow);
+//             console.log(markerList[i] + " WAS CLICKED");
+//         });
+//         document.getElementById('marker-name').appendChild(node);
+//     }
+// }
 
+var myViewModel = function () {
+
+    var self = this;
+
+    self.placeList = ko.observableArray([
+        { title: 'Bradley University' },
+        { title: 'Sigma Chi Fraternity' },
+        { title: 'Chick Fil A' },
+        { title: 'Peoria Riverfront Museum' },
+        { title: '8 Bit Arcade Bar' },
+        { title: 'Peoria Civic Center' }
+    ]);
+
+    self.showInfo = function () {
+        populateInfoWindow()
+    }
+};
+
+ko.applyBindings(new myViewModel);

@@ -11,21 +11,7 @@ var locations = [
 var map;
 
 var markers = [];
-
-var Marker = function (data) {
-    this.title = ko.obervable(data.title);
-    this.location = ko.obervable(data.location);
-};
-
-var ViewModel = function () {
-    var self = this;
-    
-    this.markerList = ko.observableArray([]);
-    
-    locations.forEach(function () {
-        
-    })
-}
+var Markers = ko.observableArray([]);
 
 // Function to initialize the map within the map div
 function initMap() {
@@ -54,17 +40,16 @@ function initMap() {
         });
         // Add marker to array
         markers.push(marker);
+        Markers.push(new Marker(map, position, title, google.maps.Animation.DROP, i+1));
         // Put onclick in the loop so that each marker has it applied
         marker.addListener('click', function () {
-            console.log(this.id);
             populateInfoWindow(this, largeInfowindow);
         });
         bounds.extend(markers[i].position);
     }
     // Extend the boundaries of the map for each marker
     map.fitBounds(bounds);
-    // Show list of markers
-    // showMarkerList(markers);
+
 }
 
 function populateInfoWindow(marker, infowindow) {
@@ -138,22 +123,23 @@ function getPlacesDetails(marker, infowindow) {
 //     }
 // }
 
-var myViewModel = function () {
+
+
+var Marker = function (map, position, title, animation, id) {
+    this.map = map;
+    this.position = position;
+    this.title = title;
+    this.animation = google.maps.Animation.DROP;
+    this.id = id;
+}
+
+function myViewModel() {
 
     var self = this;
-
-    self.placeList = ko.observableArray([
-        { title: 'Bradley University' },
-        { title: 'Sigma Chi Fraternity' },
-        { title: 'Chick Fil A' },
-        { title: 'Peoria Riverfront Museum' },
-        { title: '8 Bit Arcade Bar' },
-        { title: 'Peoria Civic Center' }
-    ]);
 
     self.showInfo = function () {
         populateInfoWindow()
     }
 };
 
-ko.applyBindings(new myViewModel);
+ko.applyBindings(new myViewModel());

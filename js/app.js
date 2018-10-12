@@ -1,16 +1,17 @@
 // Points of interest that will be shown to user
-var locations = [
+let locations = [
     {title: 'Bradley University', location: {lat: 40.697827, lng: -89.615298}},
     {title: 'Sigma Chi Fraternity', location: {lat: 40.695225, lng: -89.615009}},
     {title: 'Chick Fil A', location: {lat: 40.698760, lng: -89.615093}},
+
+    {title: 'Peoria Civic Center', location: {lat: 40.692055, lng: -89.593948}},
     {title: 'Peoria Riverfront Museum', location: {lat: 40.689378, lng: -89.589869}},
-    {title: '8 Bit Arcade Bar', location: {lat: 40.685497, lng: -89.595016}},
-    {title: 'Peoria Civic Center', location: {lat: 40.692055, lng: -89.593948}}
+    {title: '8 Bit Arcade Bar', location: {lat: 40.685497, lng: -89.595016}}
 ];
 
-var map;
-var largeInfowindow;
-var bounds;
+let map;
+let largeInfowindow;
+let bounds;
 
 // Function to initialize the map within the map div
 function initMap() {
@@ -24,15 +25,15 @@ function initMap() {
     // Creating an info window to appear when the marker is clicked
     largeInfowindow = new google.maps.InfoWindow();
 
-    var bounds = new google.maps.LatLngBounds();
+    let bounds = new google.maps.LatLngBounds();
 
     ko.applyBindings(new myViewModel());
 
 }
 
-var Marker = function (info) {
+let Marker = function (info) {
 
-    var self = this;
+    let self = this;
     this.position = info.location;
     this.title = info.title;
     this.map = map;
@@ -51,29 +52,28 @@ var Marker = function (info) {
     });
 
 }
-var myViewModel = function () {
+let myViewModel = function () {
 
-    var self = this;
+    let self = this;
 
-    this.markerList = ko.observableArray([]);
+    self.markerList = ko.observableArray([]);
 
     locations.forEach(function (location) {
         self.markerList.push(new Marker(location));
     });
 
-    for (var i = 0; i < this.markerList().length; i++) {
-        var list = document.getElementById('marker-list');
-        var node = document.createElement("LI");
-        var textnode = document.createTextNode(this.markerList()[i].marker.title);
-        console.log(this.markerList()[i].marker);
-        var temp = this.markerList()[i].marker;
+    let list = document.getElementById('marker-list');
+    for (let i = 0; i < self.markerList().length; i++) {
+
+        let node = document.createElement("button");
+        let textnode = document.createTextNode(this.markerList()[i].marker.title);
+        console.log(self.markerList()[i].marker);
+        let temp = self.markerList()[i].marker;
         node.addEventListener('click', function () {
             populateInfoWindow(temp, largeInfowindow);
         });
         node.appendChild(textnode);
         list.appendChild(node);
-
-
     }
 
 };

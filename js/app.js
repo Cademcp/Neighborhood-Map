@@ -23,6 +23,7 @@ function initMap() {
 
     // Creating an info window to appear when the marker is clicked
     largeInfowindow = new google.maps.InfoWindow();
+
     var bounds = new google.maps.LatLngBounds();
 
     ko.applyBindings(new myViewModel());
@@ -49,6 +50,7 @@ var Marker = function (info) {
         console.log(this);
         populateInfoWindow(this, largeInfowindow);
     });
+
 }
 
 var myViewModel = function() {
@@ -60,6 +62,16 @@ var myViewModel = function() {
     locations.forEach(function (location) {
         self.markerList.push(new Marker(location));
     });
+
+    for(var i = 0; i < this.markerList().length;i++) {
+        // console.log(this.markerList()[i].title);
+        var node = document.createElement("LI");
+        var textnode = document.createTextNode(this.markerList()[i].title);
+        node.appendChild(textnode);
+        document.getElementById('marker-list').appendChild(node);
+
+
+    }
 
 };
 

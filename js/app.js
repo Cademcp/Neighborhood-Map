@@ -45,15 +45,13 @@ var Marker = function (info) {
         animation: google.maps.Animation.DROP,
         map: this.map
     });
-
     this.marker.addListener('click', function() {
         console.log(this);
         populateInfoWindow(this, largeInfowindow);
     });
 
 }
-
-var myViewModel = function() {
+var myViewModel = function () {
 
     var self = this;
 
@@ -63,12 +61,17 @@ var myViewModel = function() {
         self.markerList.push(new Marker(location));
     });
 
-    for(var i = 0; i < this.markerList().length;i++) {
-        // console.log(this.markerList()[i].title);
+    for (var i = 0; i < this.markerList().length; i++) {
+        var list = document.getElementById('marker-list');
         var node = document.createElement("LI");
-        var textnode = document.createTextNode(this.markerList()[i].title);
+        var textnode = document.createTextNode(this.markerList()[i].marker.title);
+        console.log(this.markerList()[i].marker);
+        var temp = this.markerList()[i].marker;
+        node.addEventListener('click', function () {
+            populateInfoWindow(temp, largeInfowindow);
+        });
         node.appendChild(textnode);
-        document.getElementById('marker-list').appendChild(node);
+        list.appendChild(node);
 
 
     }

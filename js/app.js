@@ -64,6 +64,8 @@ let myViewModel = function () {
 
     let self = this;
 
+    this.searchKey = ko.observable('');
+
     // Creating observable array of markers. Will be used for displaying list of markers
     self.markerList = ko.observableArray([]);
 

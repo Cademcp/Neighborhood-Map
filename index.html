@@ -1,24 +1,35 @@
-<!-- This is the corresponding "starter code" for 07_Markers/Infowindows in Udacity and Google's Maps
-API Course, Lesson 1 -->
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <!-- styles put here, but you can include a CSS file and reference it instead! -->
-    <style type="text/css">
-        html, body { height: 100%; margin: 0; padding: 0; }
-        #map { height: 100%; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--Importing own styles-->
+    <link rel="stylesheet" href="css/styles.css">
+    <!--Importing Bootstrap and jQuery-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div id="marker-list">
-</div>
-<div data-bind="foreach: markerList">
-    <a href="#" data-bind="text: title, click: show"></a>
-</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4">
+            <input type="search" class="form-control">
+            <ul class="list-group" data-bind="foreach: markerList">
+                <li class="list-group-item" data-bind="text: title, click: show"></li>
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <div id="map">
 
-<div id="marker-name">
+            </div>
+        </div>
+    </div>
+
+
+
 
 </div>
-<div id="map"></div>
 
 
 <script async defer

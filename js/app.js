@@ -67,12 +67,34 @@ let myViewModel = function () {
     this.searchKey = ko.observable('');
 
     // Creating observable array of markers. Will be used for displaying list of markers
-    self.markerList = ko.observableArray([]);
+    self.markerMap = ko.observableArray([]);
 
+    // Add a marker on map for each location
     locations.forEach(function (location) {
-        self.markerList.push(new Marker(location));
+        self.markerMap.push(new Marker(location));
     });
 
+    // Filtering list of markers
+    this.markerList = ko.computed(function() {
+
+        // Taking in search criteria from textInput data-bind
+       let filterKey = self.searchKey().toLowerCase();
+       if (filterKey) {
+           // using ko arrayFilter function to filter the observable array
+           return ko.utils.arrayFilter(self.markerMap(), function(marker) {
+               let str = marker.title.toLowerCase();
+               // Determining if the search criteria is a substring of any of the marker titles
+               let result = str.includes(filterKey);
+               // Changes the visibility of the list element based on if the subset is found in the title
+               marker.visible(result);
+               return result;
+           });
+       }
+       self.markerMap().forEach(function(marker) {
+           marker.visible(true);
+       });
+       return self.markerMap();
+    }, self);
 };
 
 // function to populate infowindow provided by Udacity Google Maps API videos

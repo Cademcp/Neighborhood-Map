@@ -13,8 +13,9 @@
 <body>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-sm-4">
-            <input type="search" class="form-control">
+        <div class="form-inline col-sm-3">
+            <label for="search">Search:</label>
+            <input id="search" type="text" data-bind="textInput: searchKey">
             <ul class="list-group" data-bind="foreach: markerList">
                 <li class="list-group-item" data-bind="text: title, click: show"></li>
             </ul>

@@ -3,7 +3,6 @@ let locations = [
     {title: 'Bradley University', location: {lat: 40.697827, lng: -89.615298}},
     {title: 'Sigma Chi Fraternity', location: {lat: 40.695225, lng: -89.615009}},
     {title: 'Chick Fil A', location: {lat: 40.698760, lng: -89.615093}},
-
     {title: 'Peoria Civic Center', location: {lat: 40.692055, lng: -89.593948}},
     {title: 'Peoria Riverfront Museum', location: {lat: 40.689378, lng: -89.589869}},
     {title: '8 Bit Arcade Bar', location: {lat: 40.685497, lng: -89.595016}}
@@ -49,7 +48,8 @@ let Marker = function (info) {
 
     // Add onclick event listener to each marker on the map
     this.marker.addListener('click', function() {
-        console.log(this);
+        // bounce when clicked
+        toggleBounce(this);
         populateInfoWindow(this, largeInfowindow);
     });
 
@@ -124,3 +124,18 @@ function populateInfoWindow(marker, infowindow) {
         });
     }
 }
+
+// function to add animation to marker when they are clicked
+// Provided by Google Maps JavaScript API documentation
+function toggleBounce(marker) {
+    if (marker.getAnimation() !== null) {
+        marker.setAnimation(null);
+    } else {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function () {
+            marker.setAnimation(null);
+        }, 100);
+    }
+}
+
+

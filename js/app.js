@@ -51,14 +51,20 @@ let Marker = function (info) {
 
     let request = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
     $.getJSON(request, function (data) {
-        console.log(data['response']['venues']);
+        let venues = data['response']['venues'][0];
+        console.log(venues['location']['formattedAddress'][0]);
+
+        self.address = venues['location']['formattedAddress'][0];
+        self.cityStateZip = venues['location']['formattedAddress'][1];
+        self.country = venues['location']['formattedAddress'][2];
+
     });
 
     // Add onclick event listener to each marker on the map
     this.marker.addListener('click', function() {
         // bounce when clicked
         toggleBounce(this);
-        populateInfoWindow(this, largeInfowindow);
+        populateInfoWindow(this, self.address, self.cityStateZip, self.country, largeInfowindow);
     });
 
     // Show the infowindow when a marker is selected from the list
@@ -119,12 +125,12 @@ let myViewModel = function () {
 };
 
 // function to populate infowindow provided by Udacity Google Maps API videos
-function populateInfoWindow(marker, infowindow) {
+function populateInfoWindow(marker, address, city, country, infowindow) {
 
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
         infowindow.marker = marker;
-        infowindow.setContent('<div>' + marker.title + '</div>');
+        infowindow.setContent('<div>' + '<br>' + marker.title + '<br>' + address + '<br>' + city + '<br>' + country + '</div>');
         infowindow.open(map, marker);
         // Make sure the marker property is cleared if the infowindow is closed.
         infowindow.addListener('closeclick', function () {

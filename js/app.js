@@ -46,42 +46,37 @@ let Marker = function (info) {
         animation: google.maps.Animation.DROP,
         map: this.map
     });
+
+    // Add onclick event listener to each marker on the map
     this.marker.addListener('click', function() {
         console.log(this);
         populateInfoWindow(this, largeInfowindow);
     });
 
-}
+    // Show the infowindow when a marker is selected from the list
+    this.show = function(marker) {
+        google.maps.event.trigger(self.marker, 'click');
+    };
+
+};
+
 let myViewModel = function () {
 
     let self = this;
 
+    // Creating observable array of markers. Will be used for displaying list of markers
     self.markerList = ko.observableArray([]);
 
     locations.forEach(function (location) {
         self.markerList.push(new Marker(location));
     });
 
-    let list = document.getElementById('marker-list');
-    for (let i = 0; i < self.markerList().length; i++) {
-
-        let node = document.createElement("button");
-        let textnode = document.createTextNode(this.markerList()[i].marker.title);
-        console.log(self.markerList()[i].marker);
-        let temp = self.markerList()[i].marker;
-        node.addEventListener('click', function () {
-            populateInfoWindow(temp, largeInfowindow);
-        });
-        node.appendChild(textnode);
-        list.appendChild(node);
-    }
-
 };
 
 // function to populate infowindow provided by Udacity Google Maps API videos
 function populateInfoWindow(marker, infowindow) {
-    // Check to make sure the infowindow is not already opened on this marker.
 
+    // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
         infowindow.marker = marker;
         infowindow.setContent('<div>' + marker.title + '</div>');

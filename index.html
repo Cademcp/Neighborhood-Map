@@ -11,6 +11,9 @@ API Course, Lesson 1 -->
 <body>
 <div id="marker-list">
 </div>
+<div data-bind="foreach: markerList">
+    <a href="#" data-bind="text: title, click: show"></a>
+</div>
 
 <div id="marker-name">
 

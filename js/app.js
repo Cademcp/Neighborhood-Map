@@ -5,7 +5,7 @@ let locations = [
     {title: 'Chick Fil A', location: {lat: 40.698760, lng: -89.615093}},
     {title: 'Peoria Civic Center', location: {lat: 40.692055, lng: -89.593948}},
     {title: 'Peoria Riverfront Museum', location: {lat: 40.689378, lng: -89.589869}},
-    {title: '8 Bit Arcade Bar', location: {lat: 40.685497, lng: -89.595016}}
+    {title: 'One World', location: {lat: 40.7002132, lng: -89.6132427}}
 ];
 
 let map;
@@ -44,6 +44,14 @@ let Marker = function (info) {
         title: this.title,
         animation: google.maps.Animation.DROP,
         map: this.map
+    });
+
+    let clientID = 'R4BRRTRVV4HJWS1IA0RPRQFSEGKWYHGDV554WA52C15IDZC1';
+    let clientSecret = '2CO1SV0COTDB51LQQLL4LWQOGRIIQLV3BN4M1ATXZNFV1AJ4';
+
+    let request = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
+    $.getJSON(request, function (data) {
+        console.log(data['response']['venues']);
     });
 
     // Add onclick event listener to each marker on the map

@@ -58,6 +58,19 @@ let Marker = function (info) {
         google.maps.event.trigger(self.marker, 'click');
     };
 
+    // Filtering the map markers
+    self.filter = ko.computed(function() {
+        // Checking to see if the marker's visibility has changed
+        // Visibility changes when the user is filtering the list
+        if (self.visible() === true) {
+            // If visible is true, put the marker on the map
+            self.marker.setMap(map);
+        } else {
+            // If visible is false, do not put the marker on the map
+            self.marker.setMap(null);
+        }
+    });
+
 };
 
 let myViewModel = function () {

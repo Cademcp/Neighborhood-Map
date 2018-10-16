@@ -28,8 +28,6 @@ The following information will show how to get this program running on your loca
 
 * **Cade McPartlin** - *Full Stack Development* - [GitHub](https://github.com/Cademcp)
 
-See also the list of [contributors](https://github.com/Cademcp/Item-Catelog/graphs/contributors) who participated in this project.
-
 
 ## Acknowledgments
 

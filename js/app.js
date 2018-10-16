@@ -10,7 +10,6 @@ let locations = [
 
 let map;
 let largeInfowindow;
-let bounds;
 
 // Function to initialize the map within the map div
 function initMap() {
@@ -24,8 +23,6 @@ function initMap() {
     // Creating an info window to appear when the marker is clicked
     largeInfowindow = new google.maps.InfoWindow();
 
-    let bounds = new google.maps.LatLngBounds();
-
     ko.applyBindings(new myViewModel());
 
 }
@@ -33,12 +30,15 @@ function initMap() {
 let Marker = function (info) {
 
     let self = this;
+    // pulling location and title from info
     this.position = info.location;
     this.title = info.title;
     this.map = map;
 
+    // creating visible observable. Will be used for filtering
     this.visible = ko.observable(true);
 
+    // creating new google maps Marker object
     this.marker = new google.maps.Marker({
         position: this.position,
         title: this.title,
@@ -50,35 +50,40 @@ let Marker = function (info) {
     let clientID = 'R4BRRTRVV4HJWS1IA0RPRQFSEGKWYHGDV554WA52C15IDZC1';
     let clientSecret = '2CO1SV0COTDB51LQQLL4LWQOGRIIQLV3BN4M1ATXZNFV1AJ4';
 
-    // request to get information on the locations I have chosen
-    let venue_request = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
-    let venue_id = '';
-    var get_venues;
+    // request to get venue information from foursquare based on location lat and lng, with a query of the location name
+    let venueRequest = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
+    let venueID = '';
+    var getVenues;
+
     // using jQuery to get the json that the request returned. Pulling out the address, city, and country for each location and saving it as an attribute on the marker
-    //TODO handle errors and move initial venue request out of inner jquery request
-    $.getJSON(venue_request, function (data) {
-        get_venues = data;
+    $.getJSON(venueRequest, function (data) {
+        getVenues = data;
 
-        let venues = get_venues['response']['venues'][0];
-        // pull out venue id for next api call
+        // pulling out data to make accessing JSON easier
+        let venues = getVenues['response']['venues'][0];
 
+        // setting marker's address, city, state, zip, and country information
         self.address = venues['location']['formattedAddress'][0];
         self.cityStateZip = venues['location']['formattedAddress'][1];
         self.country = venues['location']['formattedAddress'][2];
 
-        venue_id = get_venues['response']['venues'][0]['id'];
+        // pull out venue id for next api call
+        venueID = getVenues['response']['venues'][0]['id'];
 
-        let picture_request = 'https://api.foursquare.com/v2/venues/' + venue_id + '/photos?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015';
+        // creating GET request for venue images based on venue id
+        let pictureRequest = 'https://api.foursquare.com/v2/venues/' + venueID + '/photos?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015';
 
-        $.getJSON(picture_request, function (data) {
+        // using jQuery to get json returned from venue image request. Will catch error of image not existing.
+        $.getJSON(pictureRequest, function (data) {
 
-            let picture_url_prefix = data['response']['photos']['items'][0]['prefix'];
+            // building image url
+            let pictureUrlPrefix = data['response']['photos']['items'][0]['prefix'];
 
-            let picture_url_suffix = data['response']['photos']['items'][0]['suffix'];
+            let pictureUrlSuffix = data['response']['photos']['items'][0]['suffix'];
 
-            self.venue_image = picture_url_prefix + '200' + 'x' + '200' + picture_url_suffix;
-            console.log('HERE');
-            console.log(self.venue_image);
+            // saving image uri with size of 200x200
+            self.venueImage = pictureUrlPrefix + '200' + 'x' + '200' + pictureUrlSuffix;
+
         }).fail(function () {
             // checks to see if this error message already exists, if it does then don't display it.
             // produces an error message for the user saying that foursquare images will not be loaded.
@@ -97,7 +102,19 @@ let Marker = function (info) {
         });
 
     }).fail(function () {
-        alert("uhoh");
+        // checks to see if this error message already exists, if it does then don't display it.
+        // produces an error message for the user saying that foursquare venue information will not be loaded.
+        if (!document.getElementById('venue-error')) {
+            let tag = document.createElement("p");
+            tag.setAttribute('id', 'venue-error');
+            tag.style.color = 'red';
+            let node = document.createTextNode("Foursquare could not load venue information at this time.");
+            tag.appendChild(node);
+            let header = document.getElementById('header');
+            header.appendChild(tag);
+        } else {
+            return;
+        }
     });
 
 
@@ -105,8 +122,8 @@ let Marker = function (info) {
     this.marker.addListener('click', function() {
         // bounce when clicked
         toggleBounce(this);
-        // passing in marker, as well as the marker's address, city, and country form foursquare
-        populateInfoWindow(this, self.address, self.cityStateZip, self.country, self.venue_image, largeInfowindow);
+        // passing in marker, as well as the marker's address, city, image, and country form foursquare
+        populateInfoWindow(this, self.address, self.cityStateZip, self.country, self.venueImage, largeInfowindow);
     });
 
     // Show the infowindow when a marker is selected from the list
@@ -201,5 +218,3 @@ function toggleBounce(marker) {
         }, 100);
     }
 }
-
-

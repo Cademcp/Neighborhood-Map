@@ -8,3 +8,7 @@ html, body {
     height: 800px;
     width: 100%;
 }
+
+#credit {
+    color: gray;
+}

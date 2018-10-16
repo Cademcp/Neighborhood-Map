@@ -46,25 +46,57 @@ let Marker = function (info) {
         map: this.map
     });
 
+    // client id and secret for foursquare
     let clientID = 'R4BRRTRVV4HJWS1IA0RPRQFSEGKWYHGDV554WA52C15IDZC1';
     let clientSecret = '2CO1SV0COTDB51LQQLL4LWQOGRIIQLV3BN4M1ATXZNFV1AJ4';
 
-    let request = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
-    $.getJSON(request, function (data) {
-        let venues = data['response']['venues'][0];
-        console.log(venues['location']['formattedAddress'][0]);
+    // request to get information on the locations I have chosen
+    let venue_request = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
+    let venue_id = '';
+    var get_venues;
+    // using jQuery to get the json that the request returned. Pulling out the address, city, and country for each location and saving it as an attribute on the marker
+    //TODO handle errors and move initial venue request out of inner jquery request
+    $.getJSON(venue_request, function (data) {
+        get_venues = data;
 
-        self.address = venues['location']['formattedAddress'][0];
-        self.cityStateZip = venues['location']['formattedAddress'][1];
-        self.country = venues['location']['formattedAddress'][2];
+        venue_id = get_venues['response']['venues'][0]['id'];
 
+        let picture_request = 'https://api.foursquare.com/v2/venues/' + venue_id + '/photos?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015';
+
+        $.getJSON(picture_request, function (data) {
+
+            let venues = get_venues['response']['venues'][0];
+            // pull out venue id for next api call
+
+            self.address = venues['location']['formattedAddress'][0];
+            self.cityStateZip = venues['location']['formattedAddress'][1];
+            self.country = venues['location']['formattedAddress'][2];
+            console.log(data);
+            let picture_url_prefix = data['response']['photos']['items'][0]['prefix'];
+            console.log(picture_url_prefix);
+            let picture_url_suffix = data['response']['photos']['items'][0]['suffix'];
+            console.log(picture_url_suffix);
+            let picture_width = data['response']['photos']['items'][0]['width'];
+            let picture_height = data['response']['photos']['items'][0]['height'];
+
+            self.venue_image = picture_url_prefix + '200' + 'x' + '200' + picture_url_suffix;
+            console.log('HERE');
+            console.log(self.venue_image);
+        }).fail(function () {
+            alert("test");
+        });
+
+    }).fail(function () {
+        alert("uhoh");
     });
+
 
     // Add onclick event listener to each marker on the map
     this.marker.addListener('click', function() {
         // bounce when clicked
         toggleBounce(this);
-        populateInfoWindow(this, self.address, self.cityStateZip, self.country, largeInfowindow);
+        // passing in marker, as well as the marker's address, city, and country form foursquare
+        populateInfoWindow(this, self.address, self.cityStateZip, self.country, self.venue_image, largeInfowindow);
     });
 
     // Show the infowindow when a marker is selected from the list
@@ -125,12 +157,12 @@ let myViewModel = function () {
 };
 
 // function to populate infowindow provided by Udacity Google Maps API videos
-function populateInfoWindow(marker, address, city, country, infowindow) {
+function populateInfoWindow(marker, address, city, country, image, infowindow) {
 
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
         infowindow.marker = marker;
-        infowindow.setContent('<div>' + '<br>' + marker.title + '<br>' + address + '<br>' + city + '<br>' + country + '</div>');
+        infowindow.setContent('<div>' + '<br><strong>' + marker.title + '</strong><br><br>' + address + '<br>' + city + '<br>' + country + '<br>' + '<img src=\"' + image + '\">' + '</div>');
         infowindow.open(map, marker);
         // Make sure the marker property is cleared if the infowindow is closed.
         infowindow.addListener('closeclick', function () {

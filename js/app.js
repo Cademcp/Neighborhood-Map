@@ -51,11 +51,13 @@ let Marker = function (info) {
     let clientSecret = '2CO1SV0COTDB51LQQLL4LWQOGRIIQLV3BN4M1ATXZNFV1AJ4';
 
     // request to get venue information from foursquare based on location lat and lng, with a query of the location name
-    let venueRequest = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng + '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
+    let venueRequest = 'https://api.foursquare.com/v2/venues/search?ll=' + this.position.lat + ',' + this.position.lng +
+        '&client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015' + '&query=' + this.title;
     let venueID = '';
     var getVenues;
 
-    // using jQuery to get the json that the request returned. Pulling out the address, city, and country for each location and saving it as an attribute on the marker
+    // using jQuery to get the json that the request returned. Pulling out the address, city, and country for each
+    // location and saving it as an attribute on the marker
     $.getJSON(venueRequest, function (data) {
         getVenues = data;
 
@@ -71,7 +73,8 @@ let Marker = function (info) {
         venueID = getVenues['response']['venues'][0]['id'];
 
         // creating GET request for venue images based on venue id
-        let pictureRequest = 'https://api.foursquare.com/v2/venues/' + venueID + '/photos?client_id=' + clientID + '&client_secret=' + clientSecret + '&v=20181015';
+        let pictureRequest = 'https://api.foursquare.com/v2/venues/' + venueID + '/photos?client_id=' + clientID +
+            '&client_secret=' + clientSecret + '&v=20181015';
 
         // using jQuery to get json returned from venue image request. Will catch error of image not existing.
         $.getJSON(pictureRequest, function (data) {
@@ -91,7 +94,8 @@ let Marker = function (info) {
                 let tag = document.createElement("p");
                 tag.setAttribute('id', 'image-error');
                 tag.style.color = 'red';
-                let node = document.createTextNode("Foursquare could not load images at this time. (Most likely due to premium daily request limit of 50)");
+                let node = document.createTextNode("Foursquare could not load images at this time. (Most likely due to " +
+                    "premium daily request limit of 50)");
                 tag.appendChild(node);
                 let header = document.getElementById('header');
                 header.appendChild(tag);
@@ -194,9 +198,11 @@ function populateInfoWindow(marker, address, city, country, image, infowindow) {
         // this is a premium feature of the foursquare API so there is a 50 request limit per day
         // if the image is not there, then don't show it
         if (image === undefined) {
-            infowindow.setContent('<div>' + '<br><strong>' + marker.title + '</strong><br><br>' + address + '<br>' + city + '<br>' + country + '</div>');
+            infowindow.setContent('<div>' + '<br><strong>' + marker.title + '</strong><br><br>' + address + '<br>' +
+                city + '<br>' + country + '</div>');
         } else {
-            infowindow.setContent('<div>' + '<br><strong>' + marker.title + '</strong><br><br>' + address + '<br>' + city + '<br>' + country + '<br>' + '<img src=\"' + image + '\">' + '</div>');
+            infowindow.setContent('<div>' + '<br><strong>' + marker.title + '</strong><br><br>' + address + '<br>' +
+                city + '<br>' + country + '<br>' + '<img src=\"' + image + '\">' + '</div>');
         }
         infowindow.open(map, marker);
         // Make sure the marker property is cleared if the infowindow is closed.

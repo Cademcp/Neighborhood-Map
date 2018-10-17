@@ -224,3 +224,8 @@ function toggleBounce(marker) {
         }, 100);
     }
 }
+
+// function to alert user when google maps fails to load
+function googleMapsError() {
+    alert('There was an error loading the Google Maps API');
+}
